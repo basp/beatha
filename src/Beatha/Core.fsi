@@ -38,7 +38,7 @@ val mapLivingNeighbors2: Neighborhood -> Generation -> int array2d
 
 val mapLivingNeighbors: (Generation -> int array2d)
 
-val isAlive: Generation -> Position -> bool
+val isAlive: Position -> Generation -> bool
 
 type Rule =
     { Birth: int list
@@ -46,4 +46,4 @@ type Rule =
 
 type Evaluator = GridFactory<bool> -> Generation -> Generation
 
-// val makeEvaluator: Rule -> Evaluator
+val makeEvaluator: Rule -> Evaluator

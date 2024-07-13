@@ -20,6 +20,7 @@ let parseGolly : Parser<Core.Rule, unit> =
     pchar 'B'
     >>. many1 digit
     .>> pchar '/'
+    .>> pchar 'S'
     .>>. many1 digit
     |>> fun (born, survive) ->
         { Birth = born |> List.map (fun c -> int c - int '0')
@@ -28,7 +29,8 @@ let parseGolly : Parser<Core.Rule, unit> =
 let parseRule =
     choice [ parseGolly; parseMCell ]
 
-let rule s =
-    match run parseRule s with
-    | Success (result, _, _) -> FSharp.Core.Ok result
-    | Failure (msg, _, _) -> FSharp.Core.Error msg         
+module Parse =
+    let rule s =
+        match run parseRule s with
+        | Success (result, _, _) -> FSharp.Core.Ok result
+        | Failure (msg, _, _) -> FSharp.Core.Error msg         

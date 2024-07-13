@@ -124,7 +124,7 @@ let countAliveNeighbors2 neighborhood pos (gen: Generation) =
     |> Array.where (fun opt -> opt |> Option.defaultValue false)
     |> Array.length
 
-let countAliveNeighbors = countAliveNeighbors2 Moore
+let countAliveNeighbors pos gen = countAliveNeighbors2 Moore pos gen
 
 let mapLivingNeighbors2 neighborhood (gen: Generation) =
     gen.Array
@@ -134,7 +134,7 @@ let mapLivingNeighbors2 neighborhood (gen: Generation) =
 
 let mapLivingNeighbors = mapLivingNeighbors2 Moore
 
-let isAlive (gen: Generation) pos =
+let isAlive pos (gen: Generation) =
     match gen[pos] with
     | Some a -> a
     | None -> false
@@ -145,3 +145,17 @@ type Rule =
 
 type Evaluator = GridFactory<bool> -> Generation -> Generation
 
+let makeEvaluator rule : Evaluator =
+    let b = rule.Birth
+    let s = rule.Survival
+    fun (factory: GridFactory<bool>) gen ->
+        gen
+        |> mapLivingNeighbors
+        |> Array2D.mapi (fun row col aliveNeighbors ->
+            let pos = { Row = row; Column = col }
+            let areWeAlive = gen |> isAlive pos
+            match (areWeAlive, aliveNeighbors) with
+            | true, n -> s |> List.contains n
+            | false, n -> b |> List.contains n)
+        |> factory
+        

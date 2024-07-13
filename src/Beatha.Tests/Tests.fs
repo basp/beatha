@@ -68,7 +68,7 @@ let ``Default neighbors are in the Moore neighborhood`` () =
     
 [<Fact>]
 let ``Parse rule string in Golly format`` () =
-    match rule "B123/456" with
+    match Parse.rule "B123/S456" with
     | Ok a ->
         a |> should equal
             { Birth = [1; 2; 3]
@@ -77,7 +77,7 @@ let ``Parse rule string in Golly format`` () =
     
 [<Fact>]
 let ``Parse rule string in MCell format`` () =
-    match rule "123/456" with
+    match Parse.rule "123/456" with
     | Ok a ->
         a |> should equal
             { Birth = [1; 2; 3]

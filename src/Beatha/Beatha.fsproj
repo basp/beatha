@@ -11,7 +11,7 @@
     <Compile Include="Parser.fsi" />
     <Compile Include="Parser.fs" />
     <Compile Include="Program.fs" />
-    <None Include="Sandbox.fsx" />
+    <None Include="Example.fsx" />
   </ItemGroup>
 
   <ItemGroup>
