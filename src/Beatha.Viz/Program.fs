@@ -10,11 +10,11 @@ open Raylib_CSharp.Windowing
 
 [<AutoOpen>]
 module Utils =
-    let offsetPosition pos offset  =
+    let offsetPosition (pos: Position) (offset: int * int)  =
         let rowOffset, colOffset = offset
         { Row = rowOffset + pos.Row; Column = colOffset + pos.Column }
 
-    let revive pos (gen: Generation) (offsets: (int * int) list) =
+    let revive (pos: Position) (gen: Generation) (offsets: (int * int) list) =
         offsets
         |> List.map (offsetPosition pos)
         |> List.iter (fun pos -> gen[pos] <- Some true)
@@ -24,14 +24,14 @@ type Operator =
       Dimension: int * int }
 
 module Oscillator =
-    let blinker pos (gen: Generation) =
+    let blinker pos gen =
         [ (1, 2)
           (2, 2)
           (3, 2) ]
         |> revive pos gen
         gen   
 
-    let toad pos (gen: Generation) =
+    let toad pos gen =
         [ (2, 2)
           (2, 3)
           (2, 4)
@@ -42,7 +42,7 @@ module Oscillator =
         gen
 
 module StillLife =
-    let block pos (gen: Generation) =
+    let block pos gen =
         [ (1, 1)
           (1, 2)
           (2, 1)
@@ -50,7 +50,7 @@ module StillLife =
         |> revive pos gen
         gen
         
-    let beehive pos (gen: Generation) =
+    let beehive pos gen =
         [ (1, 2)
           (1, 3)
           (2, 1)
@@ -60,7 +60,7 @@ module StillLife =
         |> revive pos gen
         gen
         
-    let loaf pos (gen: Generation) =
+    let loaf pos gen =
         [ (1, 2)
           (1, 3)
           (2, 1)
@@ -71,7 +71,7 @@ module StillLife =
         |> revive pos gen
         gen
     
-    let boat pos (gen: Generation) =
+    let boat pos gen =
         [ (1, 1)
           (1, 2)
           (2, 1)
@@ -80,7 +80,7 @@ module StillLife =
         |> revive pos gen
         gen
         
-    let tub pos (gen: Generation) =
+    let tub pos gen =
         [ (1, 2)
           (2, 1)
           (2, 3)
@@ -89,7 +89,8 @@ module StillLife =
         gen
         
 module Viz =        
-        
+
+    /// Basic example of how to setup a visualization.
     let example () =
         let factory : GridFactory<bool> =
             fun arr -> WrapGrid(arr)
@@ -106,20 +107,19 @@ module Viz =
         let rows, cols = (5, 5)
         let width, height = (800, 800)
         
+        // Calculate the horizontal and vertical stride.
+        let dx = float32 width / float32 cols
+        let dy = float32 height / float32 rows
+
+        // Setup the initial population.
         let mutable current =
             Array2D.create rows cols false
             |> factory
             |> StillLife.tub { Row = 0; Column = 0 }
-        
-        // Simulate and visualize.
-        Window.Init(width, height, "Beatha Viz")        
-        Time.SetTargetFPS 60
-        
-        let dx = float32 width / float32 cols
-        let dy = float32 height / float32 rows
-        
+
+        // We'll update every N frames so keep track of frame count.        
         let mutable frameCount = 0L
-        
+
         // We don't want all this gunk in the main drawing loop.
         let drawCells () =
             for row in [0..(current.Rows - 1)] do
@@ -137,6 +137,10 @@ module Viz =
                             Color.DarkBlue)
                     | _ -> ()
                 
+        // Start simulation.
+        Window.Init(width, height, "Beatha Viz")        
+        Time.SetTargetFPS 60       
+        
         while (not <| Window.ShouldClose()) do
             // Update portion of the game loop.
             frameCount <- frameCount + 1L
