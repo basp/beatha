@@ -13,4 +13,8 @@
     <ProjectReference Include="..\Beatha\Beatha.fsproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Raylib-CSharp" Version="4.1.4" />
+  </ItemGroup>
+
 </Project>
