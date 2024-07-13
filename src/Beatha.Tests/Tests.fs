@@ -1,8 +1,87 @@
 module Tests
 
-open System
 open Xunit
+open FsUnit.Xunit
+open Beatha.Core
+open Beatha.Parser
+
+let makeWrappedGrid: GridFactory<bool> = fun arr -> WrapGrid(arr)
+
+let makeBoundedGrid: GridFactory<bool> = fun arr -> Grid(arr)
 
 [<Fact>]
-let ``My test`` () =
-    Assert.True(true)
+let ``Wrapped grid wraps around horizontally`` () =
+    let grid = Array2D.create 3 3 false |> makeWrappedGrid
+    grid[{ Row = 0; Column = 3 }] <- Some true
+    grid[{ Row = 0; Column = 0 }] |> should equal <| Some true
+
+[<Fact>]
+let ``Wrapped grid wraps around vertically`` () =
+    let grid = Array2D.create 3 3 false |> makeWrappedGrid
+    grid[{ Row = 3; Column = 0 }] <- Some true
+    grid[{ Row = 0; Column = 0 }] |> should equal <| Some true
+    
+[<Fact>]
+let ``Bounded grid allows out of bounds row index`` () =
+    let grid = Array2D.create 3 3 false |> makeBoundedGrid
+    grid[{ Row = 5; Column = 0 }] <- Some true
+    grid[{ Row = 5; Column = 0 }] |> should equal None 
+    
+[<Fact>]
+let ``Bounded grid allows out of bounds colum index`` () =
+    let grid = Array2D.create 3 3 false |> makeBoundedGrid
+    grid[{ Row = 0; Column = 5 }] <- Some true
+    grid[{ Row = 0; Column = 5 }] |> should equal None
+    
+[<Fact>]
+let ``Neighbors of the Moore neighborhood exclude the given position`` () =
+    // https://en.wikipedia.org/wiki/Moore_neighborhood
+    let pos = { Row = 1; Column = 1 }
+    let expected =
+        [| { Row = 0; Column = 0 }
+           { Row = 0; Column = 1 }
+           { Row = 0; Column = 2 }
+           { Row = 1; Column = 0 }
+           { Row = 1; Column = 2 }
+           { Row = 2; Column = 0 }
+           { Row = 2; Column = 1 }
+           { Row = 2; Column = 2 }
+        |]        
+    neighbors2 Moore pos |> should equal expected
+
+[<Fact>]
+let ``Neighbors of the Von Neumann neighborhood exclude the given position`` () =
+    // https://en.wikipedia.org/wiki/Von_Neumann_neighborhood
+    let pos = { Row = 1; Column = 1; }
+    let expected =
+        [| { Row = 0; Column = 1 }
+           { Row = 1; Column = 0 }
+           { Row = 1; Column = 2 }
+           { Row = 2; Column = 1 }
+        |]
+    neighbors2 VonNeumann pos |> should equal expected
+    
+[<Fact>]
+let ``Default neighbors are in the Moore neighborhood`` () =
+    let pos = { Row = 1; Column = 1 }
+    neighbors pos |> should equal <| neighbors2 Moore pos
+    
+[<Fact>]
+let ``Parse rule string in Golly format`` () =
+    match rule "B123/456" with
+    | Ok a ->
+        a |> should equal
+            { Birth = [1; 2; 3]
+              Survival = [4; 5; 6] }
+    | Error msg -> Assert.Fail(msg)
+    
+[<Fact>]
+let ``Parse rule string in MCell format`` () =
+    match rule "123/456" with
+    | Ok a ->
+        a |> should equal
+            { Birth = [1; 2; 3]
+              Survival = [4; 5; 6] }
+    | Error msg -> Assert.Fail(msg)
+    
+    

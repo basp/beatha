@@ -4,3 +4,5 @@
 **/bin
 **/obj
 **/BenchmarkDotNet.Artifacts
+
+**/*.sln.DotSettings.user
