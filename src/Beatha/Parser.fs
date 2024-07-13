@@ -21,7 +21,7 @@ let parseGolly : Parser<Core.Rule, unit> =
     >>. many1 digit
     .>> pchar '/'
     .>> pchar 'S'
-    .>>. many1 digit
+    .>>. many digit
     |>> fun (born, survive) ->
         { Birth = born |> List.map (fun c -> int c - int '0')
           Survival = survive |> List.map (fun c -> int c - int '0') }

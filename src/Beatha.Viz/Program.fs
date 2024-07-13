@@ -1,6 +1,7 @@
 ﻿namespace Beatha
 
 open System
+open System.Numerics
 open Beatha.Core
 open Beatha.Parser
 open Raylib_CSharp
@@ -8,7 +9,7 @@ open Raylib_CSharp.Colors
 open Raylib_CSharp.Rendering
 open Raylib_CSharp.Windowing
 
-module Utils =
+module Gaia =
     let offsetPosition (pos: Position) (offset: int * int)  =
         let rowOffset, colOffset = offset
         { Row = rowOffset + pos.Row; Column = colOffset + pos.Column }
@@ -27,7 +28,7 @@ module Oscillator =
         [ (1, 2)
           (2, 2)
           (3, 2) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
         gen   
 
     let toad pos gen =
@@ -37,7 +38,7 @@ module Oscillator =
           (3, 1)
           (3, 2)
           (3, 3) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
         gen
         
     let beacon pos gen =
@@ -49,7 +50,7 @@ module Oscillator =
           (3, 4)
           (4, 3)
           (4, 4) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
         gen
 
 module Spaceship =
@@ -59,7 +60,7 @@ module Spaceship =
           (2, 3)
           (3, 2)
           (3, 3) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
         gen
 
 module StillLife =
@@ -68,7 +69,7 @@ module StillLife =
           (1, 2)
           (2, 1)
           (2, 2) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
         gen
         
     let beehive pos gen =
@@ -78,7 +79,7 @@ module StillLife =
           (2, 4)
           (3, 2)
           (3, 3) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
         gen
         
     let loaf pos gen =
@@ -89,7 +90,7 @@ module StillLife =
           (3, 2)
           (3, 4)
           (4, 3) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
         gen
     
     let boat pos gen =
@@ -98,7 +99,7 @@ module StillLife =
           (2, 1)
           (2, 3)
           (3, 2) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
         gen
         
     let tub pos gen =
@@ -106,7 +107,7 @@ module StillLife =
           (2, 1)
           (2, 3)
           (3, 2) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
         gen
         
 module Methuselah =
@@ -116,31 +117,76 @@ module Methuselah =
           (2, 1)
           (2, 2)
           (3, 2) ]
-        |> Utils.revive pos gen
+        |> Gaia.revive pos gen
+        gen
+        
+    let diehard pos gen =
+        [ (1, 7)
+          (2, 1)
+          (2, 2)
+          (3, 2)
+          (3, 6)
+          (3, 7)
+          (3, 8) ]
+        |> Gaia.revive pos gen
+        gen
+        
+    let acorn pos gen =
+        [ (1, 2)
+          (2, 4)
+          (3, 1)
+          (3, 2)
+          (3, 5)
+          (3, 6)
+          (3, 7) ]
+        |> Gaia.revive pos gen
+        gen
+       
+/// Contains shapes that work well with the Highlife automaton.
+module Highlife =
+    let replicator pos gen =
+        [ (1, 3)
+          (1, 4)
+          (1, 5)
+          (2, 2)
+          (2, 5)
+          (3, 1)
+          (3, 5)
+          (4, 1)
+          (4, 4)
+          (5, 1)
+          (5, 2)
+          (5, 3) ]
+        |> Gaia.revive pos gen
         gen
         
 module Viz =        
 
     /// Basic example of how to setup a visualization.
     let example () =
-        let factory : GridFactory<bool> =
-            fun arr -> WrapGrid(arr)
-            
-        let conway = "B3/S23"
         
         // Specifies the update interval in frames.
         // For example, 60 is an update of the cell grid roughly every second.
-        let N = 60L        
-           
+        let N = 10L        
+
+        // Setup the grid factory to produce a specific grid instance.
+        let factory : GridFactory<bool> =
+            fun arr -> WrapGrid(arr)
+            
         // This string represents the Conway rule.
+        let conway = "B3/S23"       
+        let highlife = "B36/S23"
+           
         let rule =
-            match (Parse.rule conway) with
+            match (Parse.rule highlife) with
             | Ok a -> a
             | Error msg -> failwith msg             
         
-        // Curry the factory for convenience.
-        let eval = factory |> (makeEvaluator rule)        
-        
+        // Create the evaluator, curry the factory for convenience.
+        let eval = factory |> (makeEvaluator rule)
+
+        // Setup grid and viewport dimensions.
+        // let rows, cols = (200, 200)
         let rows, cols = (100, 100)
         let width, height = (800, 800)
         
@@ -149,52 +195,87 @@ module Viz =
         let dx = float32 width / float32 cols
         let dy = float32 height / float32 rows
 
+        let centerPos = { Row = (rows / 2); Column = (cols / 2) }
+        
         // Setup the initial population.
         let mutable current =
             Array2D.create rows cols false
             |> factory
-            |> Methuselah.rPentomino { Row = 50; Column = 50 }
+            |> Highlife.replicator centerPos
+            
+        let countAlive (gen: Generation) =
+            let mutable n = 0
+            for row in [0 .. (gen.Rows - 1)] do
+                for col in [0 .. (gen.Columns - 1)] do
+                    let pos = { Row = row; Column = col }
+                    if isAlive pos gen then
+                        n <- n + 1                    
+            n
 
         // We'll update every N frames so keep track of frame count.        
         let mutable frameCount = 0L
-
+        let mutable generation = 0
+        let mutable alive = countAlive current       
+        
+        let rng = Random()
+        
         // We don't want all this gunk in the main drawing loop so we will
         // keep it in its own function that we can call later.
         let drawCells () =
+            alive <- 0
             for row in [0..(current.Rows - 1)] do
                 for col in [0..(current.Columns - 1)] do
                     let pos = { Row = row; Column = col }
                     match current[pos] with
                     | Some a when a ->
+                        alive <- alive + 1
                         let px = int <| round (float32 col * dx)
                         let py = int <| round (float32 row * dy)
+                        let i = 0.8f + rng.NextSingle() * 0.2f
+                        let cv = Vector4(i * 0.6f, i * 0.9f, i, 1f)
+                        let color = Color.FromNormalized(cv)
                         Graphics.DrawRectangle(
                             px + 1,
                             py + 1,
                             int dx - 2,
                             int dy - 2,
-                            Color.DarkBlue)
+                            color)
                     | _ -> ()
                 
         // Start simulation.
         Window.Init(width, height, "Beatha Viz")        
-        Time.SetTargetFPS 60       
+        Time.SetTargetFPS 60
+        
         while (not <| Window.ShouldClose()) do
             // Update portion of the game loop.
             // Start by updating the frame counter.
             frameCount <- frameCount + 1L
             
             // We only have to update every N frames. 
-            if (frameCount % N = 0) then
+            if (frameCount % N = 0) && (alive > 0) then
+                generation <- generation + 1
                 current <- eval current
 
             // Drawing portion of the game loop.
             Graphics.BeginDrawing()
             do
-                Graphics.ClearBackground(Color.RayWhite)
+                Graphics.ClearBackground(Color.Black)
                 drawCells ()
-                Graphics.DrawFPS(10, 10)                
-            Graphics.EndDrawing()
+                Graphics.DrawFPS(10, 10)
+                Graphics.DrawText(
+                    $"Generation: {generation}",
+                    10,
+                    32,
+                    20,
+                    Color.White)
+                Graphics.DrawText(
+                    $"Alive: {alive}",
+                    10,
+                    56,
+                    20,
+                    Color.White)
+                
+            Graphics.EndDrawing()            
         Window.Close()
             
     let [<EntryPoint>] main _ =
