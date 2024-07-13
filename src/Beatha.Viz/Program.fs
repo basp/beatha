@@ -40,6 +40,28 @@ module Oscillator =
           (3, 3) ]
         |> revive pos gen
         gen
+        
+    let beacon pos gen =
+        [ (1, 1)
+          (1, 2)
+          (2, 1)
+          (2, 2)
+          (3, 3)
+          (3, 4)
+          (4, 3)
+          (4, 4) ]
+        |> revive pos gen
+        gen
+
+module Spaceship =
+    let gilder pos gen =
+        [ (1, 3)
+          (2, 1)
+          (2, 3)
+          (3, 2)
+          (3, 3) ]
+        |> revive pos gen
+        gen
 
 module StillLife =
     let block pos gen =
@@ -115,7 +137,7 @@ module Viz =
         let mutable current =
             Array2D.create rows cols false
             |> factory
-            |> StillLife.tub { Row = 0; Column = 0 }
+            |> Spaceship.gilder { Row = 0; Column = 0 }
 
         // We'll update every N frames so keep track of frame count.        
         let mutable frameCount = 0L

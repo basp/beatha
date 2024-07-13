@@ -91,6 +91,50 @@ type Generation = IGrid<bool>
 /// Determines what cells are considered neighbors.
 type Neighborhood = Moore | VonNeumann    
 
+let northWest neighborhood pos =
+    match neighborhood with
+    | Moore -> Some { Row = pos.Row - 1; Column = pos.Column - 1 }
+    | VonNeumann -> None
+    
+let north neighborhood pos =
+    let pos' = { pos with Row = pos.Row - 1 }
+    match neighborhood with
+    | Moore -> Some pos'
+    | VonNeumann -> Some pos'
+
+let northEast neighborhood pos =
+    match neighborhood with
+    | Moore -> Some { Row = pos.Row - 1; Column = pos.Column + 1 }
+    | VonNeumann -> None
+    
+let east neighborhood pos =
+    let pos' = { pos with Column = pos.Column + 1 }
+    match neighborhood with
+    | Moore -> Some pos'
+    | VonNeumann -> Some pos'
+    
+let southEast neighborhood pos =
+    match neighborhood with
+    | Moore -> Some { Row = pos.Row + 1; Column = pos.Column + 1 }
+    | VonNeumann -> None
+    
+let south neighborhood pos =
+    let pos' = { pos with Row = pos.Row + 1 }
+    match neighborhood with
+    | Moore -> Some pos'
+    | VonNeumann -> Some pos'
+    
+let southWest neighborhood pos =
+    match neighborhood with
+    | Moore -> Some { Row = pos.Row + 1; Column = pos.Column - 1 }
+    | VonNeumann -> None
+    
+let west neighborhood pos =
+    let pos' = { pos with Column = pos.Column - 1 }
+    match neighborhood with
+    | Moore -> Some pos'
+    | VonNeumann -> Some pos'
+
 // Offsets for a Moore neighborhood.
 let moore =
     [| { Row = -1; Column = -1 }
@@ -187,5 +231,4 @@ let makeEvaluator rule : Evaluator =
             match (areWeAlive, aliveNeighbors) with
             | true, n -> s |> List.contains n
             | false, n -> b |> List.contains n)
-        |> factory
-        
+        |> factory        
