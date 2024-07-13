@@ -1,2 +1,2 @@
-# beatha
+# Beatha
 Life-like cellular automata.
