@@ -85,38 +85,48 @@ type [<Sealed>] WrapGrid<'a>(arr: 'a array2d) =
 /// Constructs a grid from a 2D array.
 type GridFactory<'a> = 'a array2d -> IGrid<'a>
 
+/// Convenience alias for bool grids.
 type Generation = IGrid<bool>  
     
+/// Determines what cells are considered neighbors.
 type Neighborhood = Moore | VonNeumann    
+
+let moore =
+    [| { Row = -1; Column = -1 }
+       { Row = -1; Column = 0 }
+       { Row = -1; Column = 1 }
+       { Row = 0; Column = -1 }
+       { Row = 0; Column = 1 }
+       { Row = 1; Column = -1 }
+       { Row = 1; Column = 0 }
+       { Row = 1; Column = 1 }
+    |]
+
+let vonNeumann =
+    [| { Row = -1; Column = 0 }
+       { Row = 0; Column = -1 }
+       { Row = 0; Column = 1 }
+       { Row = 1; Column = 0 }
+    |]      
     
+/// Returns an array of neighbor offsets for the given neighborhood.
+let neighborOffsets neighborhood =
+    match neighborhood with
+    | Moore -> moore
+    | VonNeumann -> vonNeumann
+    
+/// Given a neighborhood and position, returns a list of neighboring positions.
 let neighbors2 neighborhood pos =
-    let moore =
-        [| { Row = -1; Column = -1 }
-           { Row = -1; Column = 0 }
-           { Row = -1; Column = 1 }
-           { Row = 0; Column = -1 }
-           { Row = 0; Column = 1 }
-           { Row = 1; Column = -1 }
-           { Row = 1; Column = 0 }
-           { Row = 1; Column = 1 }
-        |]
-    let vonNeumann =
-        [| { Row = -1; Column = 0 }
-           { Row = 0; Column = -1 }
-           { Row = 0; Column = 1 }
-           { Row = 1; Column = 0 }
-        |]      
-    let offsets =
-        match neighborhood with
-        | Moore -> moore
-        | VonNeumann -> vonNeumann
+    let offsets = neighborOffsets neighborhood
     let offsetPosition offset =
         { Row = offset.Row + pos.Row
           Column = offset.Column + pos.Column }
     offsets |> Array.map offsetPosition
     
+/// Same as neighbors2 but always uses Moore neighborhood.
 let neighbors = neighbors2 Moore
 
+/// Given a neighborhood and position, returns the number of alive neighbors.
 let countAliveNeighbors2 neighborhood pos (gen: Generation) =
     pos
     |> neighbors2 neighborhood
@@ -124,27 +134,46 @@ let countAliveNeighbors2 neighborhood pos (gen: Generation) =
     |> Array.where (fun opt -> opt |> Option.defaultValue false)
     |> Array.length
 
+/// Same as countAliveNeighbors2 but always uses Moore neighborhood.
 let countAliveNeighbors pos gen = countAliveNeighbors2 Moore pos gen
 
+/// Returns a 2D array where each position contains the number of alive
+/// neighbors corresponding to the same position in the given generation.
 let mapLivingNeighbors2 neighborhood (gen: Generation) =
     gen.Array
     |> Array2D.mapi (fun row col _ ->
         let pos = { Row = row; Column = col }
         gen |> countAliveNeighbors2 neighborhood pos)
 
+/// Same as mapLivingNeighbors2 but always uses Moore neighborhood.
 let mapLivingNeighbors = mapLivingNeighbors2 Moore
 
+/// Given a position and a generation, returns true if that position
+/// corresponds to a living cell and false otherwise.
 let isAlive pos (gen: Generation) =
     match gen[pos] with
     | Some a -> a
     | None -> false
 
+/// A specification about how cells are born and survive.
 type Rule =
-    { Birth: int list
-      Survival: int list }
+    {
+      /// If a dead cell has a number of alive neighbors that occurs in this
+      /// list, it will be (re)born.
+      Birth: int list
+      
+      /// If an alive cell has a number of alive neighbors that occurs in this
+      /// list, it will survive.
+      Survival: int list
+    }
 
+/// An evaluator function applies a game rule to a given generation in order
+/// to produce a new successive generation. A grid factory function needs to
+/// be supplied in order to transform the raw array into one of the supported
+/// grid implementations.
 type Evaluator = GridFactory<bool> -> Generation -> Generation
 
+/// Creates an evaluator function based on the given rule.
 let makeEvaluator rule : Evaluator =
     let b = rule.Birth
     let s = rule.Survival

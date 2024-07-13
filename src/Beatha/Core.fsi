@@ -26,6 +26,8 @@ type Generation = IGrid<bool>
 
 type Neighborhood = Moore | VonNeumann    
 
+val neighborOffsets: Neighborhood -> Position array
+
 val neighbors2: Neighborhood -> Position -> Position array
 
 val neighbors: (Position -> Position array)
