@@ -3,11 +3,11 @@
 #load "Core.fs"
 #load "Parser.fs"
 
-open Beatha 
 open Beatha.Core
 open Beatha.Parser
 
-let factory = fun arr -> WrapGrid(arr) :> IGrid<bool>
+let factory = fun arr ->
+    WrapGrid(arr) :> IGrid<bool>
 
 let mutable current =
     Array2D.create 5 5 false
@@ -17,10 +17,6 @@ let mutable current =
 current[{ Row = 1; Column = 2 }] <- Some true
 current[{ Row = 2; Column = 2 }] <- Some true
 current[{ Row = 3; Column = 2 }] <- Some true
-
-let conway = {
-    Birth = [3]
-    Survival = [2; 3] }
 
 let rule =
     match (Parse.rule "B3/S23") with
