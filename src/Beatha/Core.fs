@@ -91,6 +91,7 @@ type Generation = IGrid<bool>
 /// Determines what cells are considered neighbors.
 type Neighborhood = Moore | VonNeumann    
 
+// Offsets for a Moore neighborhood.
 let moore =
     [| { Row = -1; Column = -1 }
        { Row = -1; Column = 0 }
@@ -102,6 +103,7 @@ let moore =
        { Row = 1; Column = 1 }
     |]
 
+// Offsets for a Von Neumann neighborhood.
 let vonNeumann =
     [| { Row = -1; Column = 0 }
        { Row = 0; Column = -1 }
@@ -168,9 +170,8 @@ type Rule =
     }
 
 /// An evaluator function applies a game rule to a given generation in order
-/// to produce a new successive generation. A grid factory function needs to
-/// be supplied in order to transform the raw array into one of the supported
-/// grid implementations.
+/// to produce a new successive generation. A grid factory function is used to
+/// transform the raw array into one of the supported grid implementations.
 type Evaluator = GridFactory<bool> -> Generation -> Generation
 
 /// Creates an evaluator function based on the given rule.

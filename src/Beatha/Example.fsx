@@ -18,6 +18,7 @@ current[{ Row = 1; Column = 2 }] <- Some true
 current[{ Row = 2; Column = 2 }] <- Some true
 current[{ Row = 3; Column = 2 }] <- Some true
 
+// Conway rule
 let rule =
     match (Parse.rule "B3/S23") with
     | Ok a -> a

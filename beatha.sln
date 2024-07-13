@@ -9,6 +9,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Beatha", "src\Beatha\Beatha
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Beatha.Tests", "src\Beatha.Tests\Beatha.Tests.fsproj", "{3A38287B-D6AB-48F1-BB43-272C96534A5C}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Beatha.Viz", "src\Beatha.Viz\Beatha.Viz.fsproj", "{508FCDCE-02F1-4F6F-A8B3-250C59173CF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +28,14 @@ Global
 		{3A38287B-D6AB-48F1-BB43-272C96534A5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A38287B-D6AB-48F1-BB43-272C96534A5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A38287B-D6AB-48F1-BB43-272C96534A5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{508FCDCE-02F1-4F6F-A8B3-250C59173CF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{508FCDCE-02F1-4F6F-A8B3-250C59173CF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{508FCDCE-02F1-4F6F-A8B3-250C59173CF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{508FCDCE-02F1-4F6F-A8B3-250C59173CF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{53DC0B57-6896-43F3-B211-5BF8A739AAAA} = {8238632F-EF23-4D85-90D1-9D0C587CF417}
 		{3A38287B-D6AB-48F1-BB43-272C96534A5C} = {8238632F-EF23-4D85-90D1-9D0C587CF417}
+		{508FCDCE-02F1-4F6F-A8B3-250C59173CF2} = {8238632F-EF23-4D85-90D1-9D0C587CF417}
 	EndGlobalSection
 EndGlobal
