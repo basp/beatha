@@ -1,10 +1,9 @@
 ﻿module Beatha.Core
 
-[<Struct>]
-type Position = { Row: int; Column: int }
+type [<Struct>] Position = { Row: int; Column: int }
 
 /// The interface for life-like automata grids.
-type IGrid<'a> =
+type [<Interface>] IGrid<'a> =
     
     /// Gets the number of rows in the grid.
     abstract member Rows: int
@@ -88,22 +87,6 @@ type GridFactory<'a> = 'a array2d -> IGrid<'a>
 
 type Generation = IGrid<bool>  
     
-let neighbors pos =
-    let offsets =
-        [| { Row = -1; Column = -1 }
-           { Row = -1; Column = 0 }
-           { Row = -1; Column = 1 }
-           { Row = 0; Column = -1 }
-           { Row = 0; Column = 1 }
-           { Row = 1; Column = -1 }
-           { Row = 1; Column = 0 }
-           { Row = 1; Column = 1 }
-        |]
-    let offsetPosition offset =
-        { Row = offset.Row + pos.Row
-          Column = offset.Column + pos.Column }
-    offsets |> Array.map offsetPosition
-    
 type Neighborhood = Moore | VonNeumann    
     
 let neighbors2 neighborhood pos =
@@ -131,3 +114,34 @@ let neighbors2 neighborhood pos =
         { Row = offset.Row + pos.Row
           Column = offset.Column + pos.Column }
     offsets |> Array.map offsetPosition
+    
+let neighbors = neighbors2 Moore
+
+let countAliveNeighbors2 neighborhood pos (gen: Generation) =
+    pos
+    |> neighbors2 neighborhood
+    |> Array.map (fun p -> gen[p])
+    |> Array.where (fun opt -> opt |> Option.defaultValue false)
+    |> Array.length
+
+let countAliveNeighbors = countAliveNeighbors2 Moore
+
+let mapLivingNeighbors2 neighborhood (gen: Generation) =
+    gen.Array
+    |> Array2D.mapi (fun row col _ ->
+        let pos = { Row = row; Column = col }
+        gen |> countAliveNeighbors2 neighborhood pos)
+
+let mapLivingNeighbors = mapLivingNeighbors2 Moore
+
+let isAlive (gen: Generation) pos =
+    match gen[pos] with
+    | Some a -> a
+    | None -> false
+
+type Rule =
+    { Birth: int list
+      Survival: int list }
+
+type Evaluator = GridFactory<bool> -> Generation -> Generation
+

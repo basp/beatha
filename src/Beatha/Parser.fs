@@ -7,7 +7,7 @@ type Rule =
       Survival: int list }
 
 // https://conwaylife.com/wiki/Mirek%27s_Cellebration
-let parseMCell : Parser<Rule, unit> =
+let parseMCell : Parser<Core.Rule, unit> =
     many1 digit
     .>> pchar '/'
     .>>. many1 digit
@@ -16,7 +16,7 @@ let parseMCell : Parser<Rule, unit> =
           Survival = survival |> List.map (fun c -> int c - int '0')}    
 
 /// https://golly.sourceforge.io/
-let parseGolly : Parser<Rule, unit> =
+let parseGolly : Parser<Core.Rule, unit> =
     pchar 'B'
     >>. many1 digit
     .>> pchar '/'

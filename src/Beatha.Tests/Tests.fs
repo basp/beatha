@@ -84,4 +84,27 @@ let ``Parse rule string in MCell format`` () =
               Survival = [4; 5; 6] }
     | Error msg -> Assert.Fail(msg)
     
+[<Fact>]
+let ``Calculate alive neighbors in Moore neighborhood`` () =
+    let grid = Array2D.create 3 3 true |> makeBoundedGrid
+    grid[{ Row = 1; Column = 0 }] <- Some false
+    grid
+    |> countAliveNeighbors2 Moore { Row = 1; Column = 1 }
+    |> should equal 7  
     
+[<Fact>]
+let ``Calculate alive neighbors in Von Neumann neighborhood`` () =
+    let grid = Array2D.create 3 3 true |> makeBoundedGrid
+    grid[{ Row = 1; Column = 0 }] <- Some false
+    grid
+    |> countAliveNeighbors2 VonNeumann { Row = 1; Column = 1 }
+    |> should equal 3
+
+[<Fact>]
+let ``Calculate alive neighbors uses Moore neighborhood by default`` () =
+    let grid = Array2D.create 3 3 true |> makeBoundedGrid
+    grid[{ Row = 1; Column = 0 }] <- Some false
+    let pos = { Row = 1; Column = 1 }
+    countAliveNeighbors pos grid 
+    |> should equal
+    <| countAliveNeighbors2 Moore pos grid

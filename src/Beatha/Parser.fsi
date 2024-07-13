@@ -1,7 +1,3 @@
 ﻿module Beatha.Parser
 
-type Rule =
-    { Birth: int list
-      Survival: int list }
-
-val rule : string -> Result<Rule, string>
+val rule : string -> Result<Core.Rule, string>

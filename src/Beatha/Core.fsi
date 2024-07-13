@@ -26,6 +26,24 @@ type Generation = IGrid<bool>
 
 type Neighborhood = Moore | VonNeumann    
 
-val neighbors: Position -> Position array
-
 val neighbors2: Neighborhood -> Position -> Position array
+
+val neighbors: (Position -> Position array)
+
+val countAliveNeighbors2: Neighborhood -> Position -> Generation -> int
+
+val countAliveNeighbors: (Position -> Generation -> int)
+
+val mapLivingNeighbors2: Neighborhood -> Generation -> int array2d
+
+val mapLivingNeighbors: (Generation -> int array2d)
+
+val isAlive: Generation -> Position -> bool
+
+type Rule =
+    { Birth: int list
+      Survival: int list }
+
+type Evaluator = GridFactory<bool> -> Generation -> Generation
+
+// val makeEvaluator: Rule -> Evaluator
