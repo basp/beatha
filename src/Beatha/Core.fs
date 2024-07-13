@@ -91,44 +91,52 @@ type Generation = IGrid<bool>
 /// Determines what cells are considered neighbors.
 type Neighborhood = Moore | VonNeumann    
 
+/// Get the north-west cell for given position and neighborhood.
 let northWest neighborhood pos =
     match neighborhood with
     | Moore -> Some { Row = pos.Row - 1; Column = pos.Column - 1 }
     | VonNeumann -> None
     
+/// Get the north cell for given position and neighborhood.
 let north neighborhood pos =
     let pos' = { pos with Row = pos.Row - 1 }
     match neighborhood with
     | Moore -> Some pos'
     | VonNeumann -> Some pos'
 
+/// Get the north-east cell for given position and neighborhood.
 let northEast neighborhood pos =
     match neighborhood with
     | Moore -> Some { Row = pos.Row - 1; Column = pos.Column + 1 }
     | VonNeumann -> None
     
+/// Get the east cell for given position and neighborhood.
 let east neighborhood pos =
     let pos' = { pos with Column = pos.Column + 1 }
     match neighborhood with
     | Moore -> Some pos'
     | VonNeumann -> Some pos'
     
+/// Get the south-east cell for given position and neighborhood.
 let southEast neighborhood pos =
     match neighborhood with
     | Moore -> Some { Row = pos.Row + 1; Column = pos.Column + 1 }
     | VonNeumann -> None
     
+/// Get the south cell for given position and neighborhood.
 let south neighborhood pos =
     let pos' = { pos with Row = pos.Row + 1 }
     match neighborhood with
     | Moore -> Some pos'
     | VonNeumann -> Some pos'
     
+/// Get the south-west cell for given position and neighborhood.
 let southWest neighborhood pos =
     match neighborhood with
     | Moore -> Some { Row = pos.Row + 1; Column = pos.Column - 1 }
     | VonNeumann -> None
     
+/// Get the west cell for given position and neighborhood.
 let west neighborhood pos =
     let pos' = { pos with Column = pos.Column - 1 }
     match neighborhood with
@@ -229,6 +237,8 @@ let makeEvaluator rule : Evaluator =
             let pos = { Row = row; Column = col }
             let areWeAlive = gen |> isAlive pos
             match (areWeAlive, aliveNeighbors) with
+            // If we are alive we need to check the survival list.
             | true, n -> s |> List.contains n
+            // If we are dead we need to check the birth list.
             | false, n -> b |> List.contains n)
         |> factory        
