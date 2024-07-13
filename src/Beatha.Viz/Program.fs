@@ -8,7 +8,6 @@ open Raylib_CSharp.Colors
 open Raylib_CSharp.Rendering
 open Raylib_CSharp.Windowing
 
-[<AutoOpen>]
 module Utils =
     let offsetPosition (pos: Position) (offset: int * int)  =
         let rowOffset, colOffset = offset
@@ -28,7 +27,7 @@ module Oscillator =
         [ (1, 2)
           (2, 2)
           (3, 2) ]
-        |> revive pos gen
+        |> Utils.revive pos gen
         gen   
 
     let toad pos gen =
@@ -38,7 +37,7 @@ module Oscillator =
           (3, 1)
           (3, 2)
           (3, 3) ]
-        |> revive pos gen
+        |> Utils.revive pos gen
         gen
         
     let beacon pos gen =
@@ -50,17 +49,17 @@ module Oscillator =
           (3, 4)
           (4, 3)
           (4, 4) ]
-        |> revive pos gen
+        |> Utils.revive pos gen
         gen
 
 module Spaceship =
-    let gilder pos gen =
+    let glider pos gen =
         [ (1, 3)
           (2, 1)
           (2, 3)
           (3, 2)
           (3, 3) ]
-        |> revive pos gen
+        |> Utils.revive pos gen
         gen
 
 module StillLife =
@@ -69,7 +68,7 @@ module StillLife =
           (1, 2)
           (2, 1)
           (2, 2) ]
-        |> revive pos gen
+        |> Utils.revive pos gen
         gen
         
     let beehive pos gen =
@@ -79,7 +78,7 @@ module StillLife =
           (2, 4)
           (3, 2)
           (3, 3) ]
-        |> revive pos gen
+        |> Utils.revive pos gen
         gen
         
     let loaf pos gen =
@@ -90,7 +89,7 @@ module StillLife =
           (3, 2)
           (3, 4)
           (4, 3) ]
-        |> revive pos gen
+        |> Utils.revive pos gen
         gen
     
     let boat pos gen =
@@ -99,7 +98,7 @@ module StillLife =
           (2, 1)
           (2, 3)
           (3, 2) ]
-        |> revive pos gen
+        |> Utils.revive pos gen
         gen
         
     let tub pos gen =
@@ -107,7 +106,17 @@ module StillLife =
           (2, 1)
           (2, 3)
           (3, 2) ]
-        |> revive pos gen
+        |> Utils.revive pos gen
+        gen
+        
+module Methuselah =
+    let rPentomino pos gen =
+        [ (1, 2)
+          (1, 3)
+          (2, 1)
+          (2, 2)
+          (3, 2) ]
+        |> Utils.revive pos gen
         gen
         
 module Viz =        
@@ -117,19 +126,26 @@ module Viz =
         let factory : GridFactory<bool> =
             fun arr -> WrapGrid(arr)
             
+        let conway = "B3/S23"
+        
+        // Specifies the update interval in frames.
+        // For example, 60 is an update of the cell grid roughly every second.
+        let N = 60L        
+           
         // This string represents the Conway rule.
         let rule =
-            match (Parse.rule "B3/S23") with
+            match (Parse.rule conway) with
             | Ok a -> a
             | Error msg -> failwith msg             
         
         // Curry the factory for convenience.
         let eval = factory |> (makeEvaluator rule)        
         
-        let rows, cols = (5, 5)
+        let rows, cols = (100, 100)
         let width, height = (800, 800)
         
-        // Calculate the horizontal and vertical stride.
+        // Calculate the horizontal and vertical stride for drawing the cells
+        // across the viewport.
         let dx = float32 width / float32 cols
         let dy = float32 height / float32 rows
 
@@ -137,12 +153,13 @@ module Viz =
         let mutable current =
             Array2D.create rows cols false
             |> factory
-            |> Spaceship.gilder { Row = 0; Column = 0 }
+            |> Methuselah.rPentomino { Row = 50; Column = 50 }
 
         // We'll update every N frames so keep track of frame count.        
         let mutable frameCount = 0L
 
-        // We don't want all this gunk in the main drawing loop.
+        // We don't want all this gunk in the main drawing loop so we will
+        // keep it in its own function that we can call later.
         let drawCells () =
             for row in [0..(current.Rows - 1)] do
                 for col in [0..(current.Columns - 1)] do
@@ -162,11 +179,13 @@ module Viz =
         // Start simulation.
         Window.Init(width, height, "Beatha Viz")        
         Time.SetTargetFPS 60       
-        
         while (not <| Window.ShouldClose()) do
             // Update portion of the game loop.
+            // Start by updating the frame counter.
             frameCount <- frameCount + 1L
-            if (frameCount % 30L = 0) then
+            
+            // We only have to update every N frames. 
+            if (frameCount % N = 0) then
                 current <- eval current
 
             // Drawing portion of the game loop.
