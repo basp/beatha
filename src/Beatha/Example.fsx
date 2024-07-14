@@ -29,3 +29,4 @@ let eval : Evaluator = makeEvaluator rule
 for _ in [1..4] do
     printfn $"%A{current.Array}"
     current <- current |> eval factory
+    

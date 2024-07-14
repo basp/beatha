@@ -241,4 +241,27 @@ let makeEvaluator rule : Evaluator =
             | true, n -> s |> List.contains n
             // If we are dead we need to check the birth list.
             | false, n -> b |> List.contains n)
-        |> factory        
+        |> factory
+            
+let offsetRows rows positions =
+    positions
+    |> List.map (fun pos ->
+        { pos with Row = pos.Row + rows })
+   
+let offsetCols cols positions =
+    positions
+    |> List.map (fun pos ->
+        { pos with Column = pos.Column + cols })
+   
+let offset rows cols positions =
+    positions
+    |> offsetRows rows
+    |> offsetCols cols
+    
+let flipV positions =
+    positions
+    |> List.map (fun pos -> { pos with Row = -pos.Row })
+    
+let flipH positions =
+    positions
+    |> List.map (fun pos -> { pos with Column = -pos.Column })

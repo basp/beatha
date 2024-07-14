@@ -49,3 +49,9 @@ type Rule =
 type Evaluator = GridFactory<bool> -> Generation -> Generation
 
 val makeEvaluator: Rule -> Evaluator
+
+val offsetRows: int -> Position list -> Position list
+
+val offsetCols: int -> Position list -> Position list
+
+val offset: int -> int -> Position list -> Position list

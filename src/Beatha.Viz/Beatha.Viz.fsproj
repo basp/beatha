@@ -14,7 +14,11 @@
     <Compile Include="Tetromino.fs" />
     <Compile Include="Heptomino.fs" />
     <Compile Include="Misc.fs" />
+    <Compile Include="Spaceship.fs" />
+    <Compile Include="Highlife.fs" />
+    <Compile Include="Soup.fs" />
     <Compile Include="Program.fs" />
+    <None Include="Sandbox.fsx" />
   </ItemGroup>
 
   <ItemGroup>

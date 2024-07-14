@@ -108,3 +108,52 @@ let ``Calculate alive neighbors uses Moore neighborhood by default`` () =
     countAliveNeighbors pos grid 
     |> should equal
     <| countAliveNeighbors2 Moore pos grid
+
+[<Fact>]    
+let ``Offset a list of positions by a number of rows`` () =
+    let positions =
+        [ (0, 0)
+          (1, 1)
+          (2, 2) ]
+        |> List.map (fun (row, col) ->
+            { Row = row; Column = col })
+    let expected =
+        [ { Row = 5; Column = 0 }
+          { Row = 6; Column = 1 }
+          { Row = 7; Column = 2 } ]
+    positions
+    |> offsetRows 5
+    |> should equal expected
+    
+[<Fact>]    
+let ``Offset a list of positions by a number of columns`` () =
+    let positions =
+        [ (0, 0)
+          (1, 1)
+          (2, 2) ]
+        |> List.map (fun (row, col) ->
+            { Row = row; Column = col })
+    let expected =
+        [ { Row = 0; Column = 5 }
+          { Row = 1; Column = 6 }
+          { Row = 2; Column = 7 } ]
+    positions
+    |> offsetCols 5
+    |> should equal expected
+    
+    
+[<Fact>]    
+let ``Offset a list of positions by a number of rows and columns`` () =
+    let positions =
+        [ (0, 0)
+          (1, 1)
+          (2, 2) ]
+        |> List.map (fun (row, col) ->
+            { Row = row; Column = col })
+    let expected =
+        [ { Row = 5; Column = 5 }
+          { Row = 6; Column = 6 }
+          { Row = 7; Column = 7 } ]
+    positions
+    |> offset 5 5
+    |> should equal expected

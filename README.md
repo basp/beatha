@@ -32,3 +32,12 @@ The rules of the game are determined by the `Rule` value.
 
 ### Step function
 
+# Future
+* A 2D grid should also be able to calculate its neighborhood positions by combining the neighborhoods of all alive cells.
+* This way we don't have have to loop over every cell in the grid, we can just loop over the cumulative neighborhood.
+* A better way to deal with time values, currently this is more or less done from the draw function which is not ideal.
+* An optimized grid could keep track of the alive cells so when we ask for a neighborhood we don't need to loop over the entire grid.
+
+# Finds
+* `Soup.random 3` on a wrapped grid of 180 rows and 320 columns takes about 5000 generations to stabilize into a star field.
+* 
