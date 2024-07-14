@@ -160,6 +160,9 @@ module Highlife =
         |> Gaia.revive pos gen
         gen
         
+// Cool examples
+// B3/S01234678 with (200, 200) and (800, 800) wrapped acorn.
+        
 module Viz =        
 
     /// Basic example of how to setup a visualization.
@@ -167,18 +170,29 @@ module Viz =
         
         // Specifies the update interval in frames.
         // For example, 60 is an update of the cell grid roughly every second.
-        let N = 10L        
+        // Setting N to 1 means updating every frame, this is probably not a
+        // good idea.
+        let N = 5L        
 
         // Setup the grid factory to produce a specific grid instance.
         let factory : GridFactory<bool> =
             fun arr -> WrapGrid(arr)
             
-        // This string represents the Conway rule.
-        let conway = "B3/S23"       
+        // https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
+        let conway = "B3/S23"
+        
+        // https://en.wikipedia.org/wiki/Highlife_(cellular_automaton)
         let highlife = "B36/S23"
+        
+        // https://en.wikipedia.org/wiki/Life_without_Death
+        let lifeWithoutDeath = "B3/S012345678" 
+        
+        // If we leave the 4 out we get a square-ish shape. If we leave the
+        // five out we get a circular-ish shape.
+        let lifeEpidemic = "B3/S01243678"
            
         let rule =
-            match (Parse.rule highlife) with
+            match (Parse.rule lifeWithoutDeath) with
             | Ok a -> a
             | Error msg -> failwith msg             
         
@@ -187,7 +201,7 @@ module Viz =
 
         // Setup grid and viewport dimensions.
         // let rows, cols = (200, 200)
-        let rows, cols = (100, 100)
+        let rows, cols = (200, 200)
         let width, height = (800, 800)
         
         // Calculate the horizontal and vertical stride for drawing the cells
@@ -201,7 +215,7 @@ module Viz =
         let mutable current =
             Array2D.create rows cols false
             |> factory
-            |> Highlife.replicator centerPos
+            |> Spaceship.glider centerPos
             
         let countAlive (gen: Generation) =
             let mutable n = 0
@@ -231,9 +245,10 @@ module Viz =
                         alive <- alive + 1
                         let px = int <| round (float32 col * dx)
                         let py = int <| round (float32 row * dy)
-                        let i = 0.8f + rng.NextSingle() * 0.2f
-                        let cv = Vector4(i * 0.6f, i * 0.9f, i, 1f)
-                        let color = Color.FromNormalized(cv)
+                        // let i = 0.8f + rng.NextSingle() * 0.2f
+                        // let cv = Vector4(i * 0.6f, i * 0.9f, i, 1f)
+                        // let color = Color.FromNormalized(cv)
+                        let color = Color.SkyBlue
                         Graphics.DrawRectangle(
                             px + 1,
                             py + 1,
