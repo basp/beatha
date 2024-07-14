@@ -6,6 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Gaia.fs" />
+    <Compile Include="Oscillator.fs" />
+    <Compile Include="Methuselah.fs" />
+    <Compile Include="StillLife.fs" />
+    <Compile Include="Hexomino.fs" />
+    <Compile Include="Tetromino.fs" />
+    <Compile Include="Heptomino.fs" />
+    <Compile Include="Misc.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
